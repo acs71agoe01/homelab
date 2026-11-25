@@ -1,0 +1,8 @@
+﻿.env
+*.key
+*.crt
+*.pem
+rclone.conf
+password
+*secret*
+*credentials*

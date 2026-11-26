@@ -1,8 +1,8 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 export RCLONE_CONFIG="/root/.config/rclone/rclone.conf"
-export RESTIC_REPOSITORY="rclone:gdrive:Backups_Homelab/restic-repo"
+export RESTIC_REPOSITORY="rclone:cloud:Backups_Homelab/restic-repo"
 export RESTIC_PASSWORD_FILE="/root/.config/restic/password"
 export RESTIC_CACHE_DIR="/var/cache/restic"
 
@@ -37,3 +37,8 @@ restic "${RESTIC_OPTS[@]}" backup \
 
 restic "${RESTIC_OPTS[@]}" forget --keep-daily 14 --keep-weekly 4 --keep-monthly 6 --prune
 restic "${RESTIC_OPTS[@]}" check
+
+# Push heartbeat to Uptime Kuma only when backup + integrity check succeed
+if [ -f /root/.config/restic/kuma-push-url ]; then
+  curl -fsS --max-time 10 "$(cat /root/.config/restic/kuma-push-url)" > /dev/null || true
+fi
